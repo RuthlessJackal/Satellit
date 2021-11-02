@@ -1,0 +1,69 @@
+
+PImage earth;
+PShape globe;
+
+int x = 0;
+ArrayList<Satellit> list = new ArrayList<Satellit>();
+
+
+
+void setup()
+{
+  list.add(new Satellit("25544", 10, false));
+ list.add(new Satellit("25543", 10, false));
+ list.add(new Satellit("25542", 10, false));
+ list.add(new Satellit("25533", 10, false));
+ 
+  //for(int i = 25543; i < 25544; i++)
+  //{
+    //list.add(new Satellit(str(i), 3));
+  //}
+  
+  frameRate(30);
+size(1300,1300, P3D);
+earth = loadImage("earth.jpg");
+  
+  noStroke();
+  globe = createShape(SPHERE, 80);
+  globe.setTexture(earth);
+}
+
+void draw()
+{
+ clear();
+  
+  x++;
+  
+  if(x >= 30)
+  {
+    x=0;
+    for(int i = 0; i < list.size(); i++)
+    {
+      list.get(i).GetData();
+    }
+    
+    
+  }
+  
+  pushMatrix();
+  background(51);
+  translate(width*0.5, height*0.5);
+  lights();
+  fill(200);
+  noStroke();
+  shape(globe);
+  popMatrix();
+  
+  for(int i = 0; i < list.size(); i++)
+  {
+   list.get(i).loop(); 
+  }
+  
+  
+  
+  
+ 
+ 
+ 
+ 
+}
