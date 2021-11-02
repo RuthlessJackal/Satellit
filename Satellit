@@ -1,0 +1,97 @@
+class Satellit
+{
+ 
+  String satellitID;
+  float altitude;
+  float circleRadius;
+  float currentLatitude;
+  float currentLongitude;
+  boolean animate;
+  float angleSpeedTheta;
+  float angleSpeedPhi;
+  float lastTheta;
+  float lastPhi;
+  
+  String APIKey = "JTSXMG-JCYBPY-USS5YY-4SQ9";
+  
+  Satellit(String satellitID, float radius, boolean animate)
+  {
+   this.animate = animate;
+    this.satellitID = satellitID;
+   circleRadius = radius;
+   JSONObject data = loadJSONObject("https://api.n2yo.com/rest/v1/satellite/positions/" + satellitID + "/41.702/-76.014/0/2/&apiKey=" + APIKey + "").getJSONArray("positions").getJSONObject(0);
+    currentLatitude = data.getFloat("satlatitude");
+    currentLongitude = data.getFloat("satlongitude");
+    altitude = pow(data.getFloat("sataltitude"),0.5) + 150;
+    UpdateAngleSpeed();
+  }
+  
+  void GetData()
+  {
+    JSONObject data = loadJSONObject("https://api.n2yo.com/rest/v1/satellite/positions/" + satellitID + "/41.702/-76.014/0/2/&apiKey=" + APIKey + "").getJSONArray("positions").getJSONObject(0);
+    currentLatitude = data.getFloat("satlatitude");
+    currentLongitude = data.getFloat("satlongitude");
+  }
+  
+  void UpdateAngleSpeed()
+  {
+    JSONArray a = loadJSONObject("https://api.n2yo.com/rest/v1/satellite/positions/" + satellitID + "/41.702/-76.014/0/2/&apiKey=" + APIKey + "").getJSONArray("positions");
+    JSONObject b = a.getJSONObject(0);
+    
+    float latitude1 = b.getFloat("satlatitude");
+    float longitude1 = b.getFloat("satlongitude");
+    
+    float theta1 = radians(latitude1);
+    float phi1 = radians(longitude1) + PI;
+    
+    b = a.getJSONObject(1);
+    float latitude2 = b.getFloat("satlatitude");
+    float longitude2 = b.getFloat("satlongitude");
+    
+    float theta2 = radians(latitude2);
+    float phi2 = radians(longitude2) + PI;
+    
+    angleSpeedTheta = (theta2 - theta1) * 100;
+    angleSpeedPhi = (phi2 - phi1) * 100;
+  }
+  
+  void loop()
+  {
+   //Draw
+   if(!animate)
+   {
+     push();
+  translate(width*0.5, height*0.5);
+  float theta = radians(currentLatitude);
+  float phi = radians(currentLongitude) + PI;
+   
+  float x = altitude * cos(theta) * cos(phi);
+  float y = -altitude * sin(theta);
+
+
+
+  circle(x,y,circleRadius);
+  pop(); 
+   }
+   else
+   {
+     println(lastTheta, lastPhi);
+     println(angleSpeedTheta, angleSpeedPhi);
+     push();
+      translate(width*0.5, height*0.5);
+      float x = altitude * cos(lastTheta + angleSpeedTheta) * cos(lastPhi + angleSpeedPhi);
+      float y = -altitude * sin(lastTheta + angleSpeedTheta);
+      lastTheta = lastTheta + angleSpeedTheta;
+      lastPhi = lastPhi + angleSpeedPhi;
+      circle(x,y,circleRadius);
+      pop(); 
+   }
+   
+   
+   
+   
+   
+   //check if mouse over
+  }
+  
+}
